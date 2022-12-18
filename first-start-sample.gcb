@@ -1,17 +1,17 @@
 #CHIP 16F887
 
-'Components
+// Components
 #DEFINE MotorL PortB.2
 #DEFINE MotorL2 PortB.3
 #DEFINE MotorR PortB.4
 #DEFINE MotorR2 PortB.5
-#DEFINE WallDet1 PortA.0 'D2, AN0
-#DEFINE WallDet2 PortA.1 'D3, AN1
-#DEFINE LineDet PortA.3 'D5, AN3
-#DEFINE FireDet PortA.5 'D7, AN4
+#DEFINE WallDet1 PortA.0 // D2, AN0
+#DEFINE WallDet2 PortA.1 // D3, AN1
+#DEFINE LineDet PortA.3 // D5, AN3
+#DEFINE FireDet PortA.5 // D7, AN4
 #DEFINE FanMotor PortB.1
 
-'LCD display
+// LCD display
 #DEFINE LCD_IO 4
 #DEFINE LCD_RS portd.0
 #DEFINE LCD_RW portd.1
@@ -21,7 +21,7 @@
 #DEFINE LCD_DB6 portd.6
 #DEFINE LCD_DB7 portd.7
 
-'Pinout
+// Pinout
 Dir MotorL Out
 Dir MotorL2 Out
 Dir MotorR Out
@@ -32,7 +32,7 @@ Dir WallDet2 In
 Dir FireDet In
 Dir FanMotor Out
 
-'Variables
+// Variables
 Dim wallDist as byte
 Dim deltaWallDist as byte
 Dim fireValue as byte
@@ -40,20 +40,18 @@ Dim lineCount as byte
 
 
 
-'Void setup
+// Void setup
 FanMotor = false
 LineDet = true
-
-' Motors on by default
-MotorL = true
-MotorR = true
+lineCount = 0
+// Motors on by default
+MotorL = false
+MotorR = false
 MotorL2 = false
 MotorR2 = false
 
 
-'Void loop
 Do
-'  Loop initialization
   wallDist1 = ReadAD(AN0);
   wallDist1 = (((6787/(wallDist1-3)))-4)/5
   wallDist2 = ReadAD(AN1);
@@ -61,7 +59,7 @@ Do
   fireValue = ReadAD(AN4);
   lineDetValue = ReadAD(AN3)
 
-  // CLS
+  CLS
   // Locate 0,0
   // print("Front: ")
   // print (wallDist1)
@@ -69,23 +67,21 @@ Do
   // print("Left: ")
   // print (wallDist2)
 
-' Wall hug
-' Are adjustments necessary? If so, take 100 ms to make the turn
-' Adjusting range, 10 - 15 good range
 
   if wallDist1 =< 10 & wallDist1 > 4 then
-    // print ("Reverse")
+    print ("Reverse")
     gosub Reverse
-  else if wallDist2 > 25 then
-    gosub TurnLeftSharp
-'    print("Left Sharp")
-  else if wallDist2 > 20 then
-    gosub TurnLeft
-  else if wallDist2 < 10 then
-    gosub TurnRight
-  else
-    gosub Straight
   end if
+//   else if wallDist2 > 25 then
+//     gosub TurnLeftSharp
+// '    print("Left Sharp")
+//   else if wallDist2 > 20 then
+//     gosub TurnLeft
+//   else if wallDist2 < 10 then
+//     gosub TurnRight
+//   else
+//     gosub Straight
+//   end if
 
 
   // Line detection
@@ -93,22 +89,22 @@ Do
     lineCount += 1
     CLS
     locate 0, 0
-    print ("Line Detected: ")
+    print ("Line Det: ")
     print (lineCount)
 
     gosub Straight
     wait 750 ms
   end if
 
-'  Fire detection
-'  Locate (0, 0)
-'  print(" F: ")
-'  print(fireValue)
-'  if fireValue < 100 then
-'     FanMotor = true
-'  else
-'     FanMotor = false
-'  end if
+//  Fire detection
+//  Locate (0, 0)
+//  print(" F: ")
+//  print(fireValue)
+//  if fireValue < 100 then
+//     FanMotor = true
+//  else
+//     FanMotor = false
+//  end if
 Loop
 
 Sub Straight
@@ -121,12 +117,12 @@ Sub Reverse
   MotorL = false
   MotorR = false
   MotorL2 = true
-  MotorR2 = true
+  // MotorR2 = true
   wait 750 ms
-' Start going forward
+// Start going forward
   MotorL2 = false
   MotorR2 = false
-' Turn right a bit
+// Turn right a bit
   MotorL = true
   MotorR = false
   wait 750 ms
@@ -159,4 +155,4 @@ Sub TurnRight
   wait 5 ms
 return
 
-' Do:
+// Do:
