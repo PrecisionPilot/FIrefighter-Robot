@@ -1,0 +1,60 @@
+#CHIP 16F887
+
+'Components
+#DEFINE MotorL PortB.2
+#DEFINE MotorL2 PortB.3
+#DEFINE MotorR PortB.4
+#DEFINE MotorR2 PortB.5
+#DEFINE WallDet1 PortA.0 'D2, AN0
+#DEFINE WallDet2 PortA.1 'D3, AN1
+#DEFINE LineDet PortA.3 'D5, AN3
+#DEFINE FireDet PortA.5 'D7, AN4
+#DEFINE FanMotor PortB.1
+
+'LCD display
+#DEFINE LCD_IO 4
+#DEFINE LCD_RS portd.0
+#DEFINE LCD_RW portd.1
+#DEFINE LCD_Enable portd.2
+#DEFINE LCD_DB4 portd.4
+#DEFINE LCD_DB5 portd.5
+#DEFINE LCD_DB6 portd.6
+#DEFINE LCD_DB7 portd.7
+
+'Pinout
+Dir MotorL Out
+Dir MotorL2 Out
+Dir MotorR Out
+Dir MotorR2 Out
+Dir LineDet In
+Dir WallDet1 In
+Dir WallDet2 In
+Dir FireDet In
+Dir FanMotor Out
+
+'Variables
+Dim wallDist as byte
+Dim deltaWallDist as byte
+Dim fireValue as byte
+Dim lineCount as byte
+
+
+
+'Void setup
+FanMotor = false
+LineDet = true
+
+Dim lineCount as byte
+
+Do
+  if LineDet = 0 then
+    CLS
+    locate 0, 0
+    lineCount += 1
+    print ("Line Detected: ")
+    print (lineCount)
+
+    gosub Straight
+    wait 750 ms
+  end if
+Loop

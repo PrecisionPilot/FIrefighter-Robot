@@ -36,6 +36,7 @@ Dir FanMotor Out
 Dim wallDist as byte
 Dim deltaWallDist as byte
 Dim fireValue as byte
+Dim lineCount as byte
 
 
 
@@ -58,21 +59,22 @@ Do
   wallDist2 = ReadAD(AN1);
   wallDist2 = (((6787/(wallDist2-3)))-4)/5
   fireValue = ReadAD(AN4);
+  lineDetValue = ReadAD(AN3)
 
-  CLS
-  Locate 0,0
-  print("Front: ")
-  print (wallDist1)
-  Locate 1,0
-  print("Left: ")
-  print (wallDist2)
+  // CLS
+  // Locate 0,0
+  // print("Front: ")
+  // print (wallDist1)
+  // Locate 1,0
+  // print("Left: ")
+  // print (wallDist2)
 
 ' Wall hug
 ' Are adjustments necessary? If so, take 100 ms to make the turn
 ' Adjusting range, 10 - 15 good range
 
   if wallDist1 =< 10 & wallDist1 > 4 then
-    print ("Reverse")
+    // print ("Reverse")
     gosub Reverse
   else if wallDist2 > 25 then
     gosub TurnLeftSharp
@@ -85,16 +87,18 @@ Do
     gosub Straight
   end if
 
-'  If line deteected
-  if LineDet = 0 then
+
+  // Line detection
+  if lineDetValue < 100 then
+    lineCount += 1
     CLS
     locate 0, 0
     print ("Line Detected: ")
-    print ("")
-  end if
-'   Move backwards
-    gosub straight
+    print (lineCount)
+
+    gosub Straight
     wait 750 ms
+  end if
 
 '  Fire detection
 '  Locate (0, 0)
@@ -126,6 +130,7 @@ Sub Reverse
   MotorL = true
   MotorR = false
   wait 750 ms
+return
 
 Sub TurnLeft
   MotorL = false
