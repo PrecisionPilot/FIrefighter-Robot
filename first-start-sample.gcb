@@ -1,0 +1,157 @@
+#CHIP 16F887
+
+'Components
+#DEFINE MotorL PortB.2
+#DEFINE MotorL2 PortB.3
+#DEFINE MotorR PortB.4
+#DEFINE MotorR2 PortB.5
+#DEFINE WallDet1 PortA.0 'D2, AN0
+#DEFINE WallDet2 PortA.1 'D3, AN1
+#DEFINE LineDet PortA.3 'D5, AN3
+#DEFINE FireDet PortA.5 'D7, AN4
+#DEFINE FanMotor PortB.1
+
+'LCD display
+#DEFINE LCD_IO 4
+#DEFINE LCD_RS portd.0
+#DEFINE LCD_RW portd.1
+#DEFINE LCD_Enable portd.2
+#DEFINE LCD_DB4 portd.4
+#DEFINE LCD_DB5 portd.5
+#DEFINE LCD_DB6 portd.6
+#DEFINE LCD_DB7 portd.7
+
+'Pinout
+Dir MotorL Out
+Dir MotorL2 Out
+Dir MotorR Out
+Dir MotorR2 Out
+Dir LineDet In
+Dir WallDet1 In
+Dir WallDet2 In
+Dir FireDet In
+Dir FanMotor Out
+
+'Variables
+Dim wallDist as byte
+Dim deltaWallDist as byte
+Dim fireValue as byte
+
+
+
+'Void setup
+FanMotor = false
+LineDet = true
+
+' Motors on by default
+MotorL = true
+MotorR = true
+MotorL2 = false
+MotorR2 = false
+
+
+'Void loop
+Do
+'  Loop initialization
+  wallDist1 = ReadAD(AN0);
+  wallDist1 = (((6787/(wallDist1-3)))-4)/5
+  wallDist2 = ReadAD(AN1);
+  wallDist2 = (((6787/(wallDist2-3)))-4)/5
+  fireValue = ReadAD(AN4);
+
+  CLS
+  Locate 0,0
+  print("Front: ")
+  print (wallDist1)
+  Locate 1,0
+  print("Left: ")
+  print (wallDist2)
+
+' Wall hug
+' Are adjustments necessary? If so, take 100 ms to make the turn
+' Adjusting range, 10 - 15 good range
+
+  if wallDist1 =< 10 & wallDist1 > 4 then
+    print ("Reverse")
+    gosub Reverse
+  else if wallDist2 > 25 then
+    gosub TurnLeftSharp
+'    print("Left Sharp")
+  else if wallDist2 > 20 then
+    gosub TurnLeft
+  else if wallDist2 < 10 then
+    gosub TurnRight
+  else
+    gosub Straight
+  end if
+
+'  If line deteected
+  if LineDet = 0 then
+    CLS
+    locate 0, 0
+    print ("Line Detected: ")
+    print ()
+
+'   Move backwards
+    gosub straight
+    wait 750 ms
+
+'  Fire detection
+'  Locate (0, 0)
+'  print(" F: ")
+'  print(fireValue)
+'  if fireValue < 100 then
+'     FanMotor = true
+'  else
+'     FanMotor = false
+'  end if
+Loop
+
+Sub Straight
+  MotorL = true
+  MotorR = true
+  wait 10 ms
+return
+
+Sub Reverse
+  MotorL = false
+  MotorR = false
+  MotorL2 = true
+  MotorR2 = true
+  wait 750 ms
+' Start going forward
+  MotorL2 = false
+  MotorR2 = false
+' Turn right a bit
+  MotorL = true
+  MotorR = false
+  wait 750 ms
+
+Sub TurnLeft
+  MotorL = false
+  MotorR = true
+  wait 5 ms
+  MotorL = true
+  MotorR = true
+  wait 5 ms
+return
+
+Sub TurnLeftSharp
+  MotorL = false
+  MotorR = true
+  wait 15 ms
+  MotorL = true
+  MotorR = true
+  wait 1 ms
+return
+
+Sub TurnRight
+  MotorL = true
+  MotorR = false
+  wait 5 ms
+  MotorL = true
+  MotorR = true
+  wait 5 ms
+return
+
+' Do:
