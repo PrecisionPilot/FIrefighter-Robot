@@ -60,41 +60,42 @@ Do
   lineDetValue = ReadAD(AN3)
 
   CLS
-  // Locate 0,0
-  // print("Front: ")
-  // print (wallDist1)
-  // Locate 1,0
-  // print("Left: ")
-  // print (wallDist2)
+  Locate 0,0
+  print("Front: ")
+  print (wallDist1)
+  Locate 1,0
+  print("Left: ")
+  print (wallDist2)
 
 
-  if wallDist1 =< 10 & wallDist1 > 4 then
-    print ("Reverse")
-    gosub Reverse
-  end if
-//   else if wallDist2 > 25 then
-//     gosub TurnLeftSharp
-// '    print("Left Sharp")
-//   else if wallDist2 > 20 then
-//     gosub TurnLeft
-//   else if wallDist2 < 10 then
-//     gosub TurnRight
-//   else
-//     gosub Straight
-//   end if
+  // if wallDist1 =< 10 & wallDist1 > 4 then
+  //   locate 0,0
+  //   print ("Reverse")
+  //   gosub Reverse
+  // else if wallDist2 > 25 then
+  //   gosub TurnLeftSharp
+  //   locate 0,0
+  //   print("Left Sharp")
+  // else if wallDist2 > 20 then
+  //   gosub TurnLeft
+  // else if wallDist2 < 10 then
+  //   gosub TurnRight
+  // else
+  //   gosub Straight
+  // end if
 
 
   // Line detection
-  if lineDetValue < 100 then
-    lineCount += 1
-    CLS
-    locate 0, 0
-    print ("Line Det: ")
-    print (lineCount)
+  // if lineDetValue < 100 then
+  //   lineCount += 1
+  //   CLS
+  //   locate 0, 0
+  //   print ("Line Det: ")
+  //   print (lineCount)
 
-    gosub Straight
-    wait 750 ms
-  end if
+  //   gosub Straight
+  //   wait 750 ms
+  // end if
 
 //  Fire detection
 //  Locate (0, 0)
@@ -105,6 +106,9 @@ Do
 //  else
 //     FanMotor = false
 //  end if
+  if fireValue < 50 then
+    gosub Reverse
+  end if
 Loop
 
 Sub Straight
@@ -117,7 +121,7 @@ Sub Reverse
   MotorL = false
   MotorR = false
   MotorL2 = true
-  // MotorR2 = true
+  MotorR2 = true
   wait 750 ms
 // Start going forward
   MotorL2 = false
@@ -126,6 +130,8 @@ Sub Reverse
   MotorL = true
   MotorR = false
   wait 750 ms
+  MotorL = false
+  MotorR = false
 return
 
 Sub TurnLeft
@@ -154,5 +160,3 @@ Sub TurnRight
   MotorR = true
   wait 5 ms
 return
-
-// Do:
