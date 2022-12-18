@@ -1,4 +1,4 @@
-.hex
-.html
-.lst
-.asm
+*.hex
+*.html
+*.lst
+*.asm

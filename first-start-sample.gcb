@@ -90,8 +90,8 @@ Do
     CLS
     locate 0, 0
     print ("Line Detected: ")
-    print ()
-
+    print ("")
+  end if
 '   Move backwards
     gosub straight
     wait 750 ms
