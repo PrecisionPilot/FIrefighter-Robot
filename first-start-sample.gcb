@@ -52,50 +52,54 @@ MotorR2 = false
 
 
 Do
-  wallDist1 = ReadAD(AN0);
-  wallDist1 = (((6787/(wallDist1-3)))-4)/5
-  wallDist2 = ReadAD(AN1);
-  wallDist2 = (((6787/(wallDist2-3)))-4)/5
+  frontWallDist = ReadAD(AN0);
+  frontWallDist = (((6787/(frontWallDist-3)))-4)/5
+  if frontWallDist = 4 then
+    frontWallDist = 255
+  end if
+  leftWallDist = ReadAD(AN1);
+  leftWallDist = (((6787/(leftWallDist-3)))-4)/5
+  if leftWallDist = 4 then
+    leftWallDist = 255
+  end if
   fireValue = ReadAD(AN4);
   lineDetValue = ReadAD(AN3)
 
   CLS
   Locate 0,0
   print("Front: ")
-  print (wallDist1)
-  Locate 1,0
-  print("Left: ")
-  print (wallDist2)
+  print (frontWallDist)
+  locate 1, 0
+  print ("Line Det: ")
+  print (lineCount)
+  // Locate 1,0
+  // print("Left: ")
+  // print (leftWallDist)
 
-
-  // if wallDist1 =< 10 & wallDist1 > 4 then
-  //   locate 0,0
-  //   print ("Reverse")
-  //   gosub Reverse
-  // else if wallDist2 > 25 then
-  //   gosub TurnLeftSharp
-  //   locate 0,0
-  //   print("Left Sharp")
-  // else if wallDist2 > 20 then
-  //   gosub TurnLeft
-  // else if wallDist2 < 10 then
-  //   gosub TurnRight
-  // else
-  //   gosub Straight
-  // end if
+  if frontWallDist =< 10 then
+    gosub Reverse
+  // else if frontWallDist =< 11 then
+  //   MotorL = true
+  //   MotorR = false
+  //   wait 750 ms
+  //   MotorL = false
+  else if leftWallDist > 25 then
+    gosub TurnLeftSharp
+  else if leftWallDist > 20 then
+    gosub TurnLeft
+  else if leftWallDist < 10 then
+    gosub TurnRight
+  else
+    gosub Straight
+  end if
 
 
   // Line detection
-  // if lineDetValue < 100 then
-  //   lineCount += 1
-  //   CLS
-  //   locate 0, 0
-  //   print ("Line Det: ")
-  //   print (lineCount)
-
-  //   gosub Straight
-  //   wait 750 ms
-  // end if
+  if lineDetValue < 100 then
+    lineCount += 1
+    gosub Straight
+    wait 750 ms
+  end if
 
 //  Fire detection
 //  Locate (0, 0)
@@ -106,9 +110,9 @@ Do
 //  else
 //     FanMotor = false
 //  end if
-  if fireValue < 50 then
-    gosub Reverse
-  end if
+  // if fireValue < 50 then
+  //   gosub Reverse
+  // end if
 Loop
 
 Sub Straight
