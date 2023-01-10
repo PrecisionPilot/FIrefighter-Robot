@@ -37,96 +37,177 @@ Dim wallDist as byte
 Dim deltaWallDist as byte
 Dim fireValue as byte
 Dim lineCount as byte
-
+Dim isFire as byte
+Dim fireTrigger as byte
 
 
 // Void setup
 FanMotor = false
 LineDet = true
 lineCount = 0
+isFire = 0
+fireTrigger = 5
 // Motors on by default
 MotorL = false
 MotorR = false
 MotorL2 = false
 MotorR2 = false
 
+gosub CheckRoom4
 
 Do
-  frontWallDist = ReadAD(AN0);
-  frontWallDist = (((6787/(frontWallDist-3)))-4)/5
-  if frontWallDist = 4 then
-    frontWallDist = 255
-  end if
-  leftWallDist = ReadAD(AN1);
-  leftWallDist = (((6787/(leftWallDist-3)))-4)/5
-  if leftWallDist = 4 then
-    leftWallDist = 255
-  end if
-  fireValue = ReadAD(AN4);
+  wallDistF = ReadAD(AN0)
+  wallDistF = (((6787/(wallDistF-3)))-4)/5
+  wallDistL = ReadAD(AN1)
+  wallDistL = (((6787/(wallDistL-3)))-4)/5
+  fireValue = ReadAD(AN4)
   lineDetValue = ReadAD(AN3)
 
   CLS
   Locate 0,0
-  print("Front: ")
-  print (frontWallDist)
-  locate 1, 0
+  // print("Front: ")
+  // print (wallDistF)
+  print ("Left: ")
+  print (wallDistL)
+  // print ("F: ")
+  // print (fireValue)
+  // print ("Front: ")
+  // print (wallDistF)
+  Locate 1,0
   print ("Line Det: ")
   print (lineCount)
-  // Locate 1,0
-  // print("Left: ")
-  // print (leftWallDist)
-
-  if frontWallDist =< 10 then
-    gosub Reverse
-  // else if frontWallDist =< 11 then
-  //   MotorL = true
-  //   MotorR = false
-  //   wait 750 ms
-  //   MotorL = false
-  else if leftWallDist > 25 then
-    gosub TurnLeftSharp
-  else if leftWallDist > 20 then
-    gosub TurnLeft
-  else if leftWallDist < 10 then
-    gosub TurnRight
-  else
-    gosub Straight
+  if fireValue <= fireTrigger then
+    isFire = 1
   end if
+  if isFire = 1 then
+    locate (1, 0)
+    print ("Fire!!")
+    FanMotor = true
+    gosub FireCheck
 
+    if fireValue > 210 then
+      isFire = 0
+    end if
+  else
+    locate (1, 0)
+    print("No fire")
+    FanMotor = false
+    
+    // Room 2
+    if lineCount = 100 then
+    //   else if wallDistF =< 10 then
+    //     // locate 0,0
+    //     // print ("Reverse")
+    //     gosub Reverse
+    //   else if wallDistL > 25 then
+    //     gosub TurnLeftSharp
+    //     // locate 0,0
+    //     // print("Left Sharp")
+    //   else if wallDistL > 20 then
+    //     gosub TurnLeft
+    //     // Locate 0,0
+    //     // print("Left")
+    //   else if wallDistL < 10 then
+    //     // Locate 0,0
+    //     // print("Right")
+    //     MotorL = true
+    //     MotorR = false
+    //     wait 150 ms
+    //     // gosub TurnRight
+    //   else
+    //     gosub Straight
+    //   end if
+    // // Default "room"
+    else
+      if wallDistF =< 10 & wallDistL =< 10 then
+        // locate 0,0
+        // print ("Right Sharp")
+        gosub TurnRightSharp
+      else if wallDistF =< 10 then
+        // locate 0,0
+        // print ("Reverse")
+        gosub Reverse
+      else if wallDistL > 25 then
+        gosub TurnLeftSharp
+        // locate 0,0
+        // print("Left Sharp")
+      else if wallDistL > 20 then
+        gosub TurnLeft
+        // Locate 0,0
+        // print("Left")
+      else if wallDistL < 10 then
+        // Locate 0,0
+        // print("Right")
+        MotorL = true
+        MotorR = false
+        wait 100 ms
+        // gosub TurnRight
+      else
+        gosub Straight
+      end if
+    end if
+  end if
 
   // Line detection
   if lineDetValue < 100 then
     lineCount += 1
-    gosub Straight
-    wait 750 ms
   end if
+  
 
-//  Fire detection
-//  Locate (0, 0)
-//  print(" F: ")
-//  print(fireValue)
-//  if fireValue < 100 then
-//     FanMotor = true
-//  else
-//     FanMotor = false
-//  end if
-  // if fireValue < 50 then
-  //   gosub Reverse
-  // end if
 Loop
+
+Sub CheckRoom4
+  // Go straight
+  MotorL = true
+  MotorR = true
+  wait 2500 ms
+  // Turn
+  MotorL = true
+  MotorR = false
+  wait 1750 ms
+  // TODO: Check fire
+end sub
+
+Sub FireCheck
+  // Set right and left motors off by default
+
+  // Right and back
+  MotorL = true
+  MotorL2 = false
+  MotorR = false
+  MotorR2 = true
+  wait 175 ms
+  MotorL = false
+  MotorL2 = true
+  MotorR = true
+  MotorR2 = false
+  wait 175 ms
+
+  // Left and back
+  MotorR = true
+  MotorR2 = false
+  MotorL = false
+  MotorL2 = true
+  wait 190 ms
+  MotorR = false
+  MotorR2 = true
+  MotorL = true
+  MotorL2 = false
+  wait 175 ms
+end sub
 
 Sub Straight
   MotorL = true
   MotorR = true
   wait 10 ms
-return
+end sub
 
 Sub Reverse
   MotorL = false
   MotorR = false
   MotorL2 = true
   MotorR2 = true
-  wait 750 ms
+  wait 500 ms
 // Start going forward
   MotorL2 = false
   MotorR2 = false
@@ -136,7 +217,7 @@ Sub Reverse
   wait 750 ms
   MotorL = false
   MotorR = false
-return
+end sub
 
 Sub TurnLeft
   MotorL = false
@@ -145,7 +226,7 @@ Sub TurnLeft
   MotorL = true
   MotorR = true
   wait 5 ms
-return
+end sub
 
 Sub TurnLeftSharp
   MotorL = false
@@ -154,7 +235,7 @@ Sub TurnLeftSharp
   MotorL = true
   MotorR = true
   wait 1 ms
-return
+end sub
 
 Sub TurnRight
   MotorL = true
@@ -163,4 +244,31 @@ Sub TurnRight
   MotorL = true
   MotorR = true
   wait 5 ms
-return
+end sub
+
+Sub TurnRightSharp
+  MotorL = true
+  MotorR = false
+  wait 15 ms
+  MotorL = true
+  MotorR = true
+  wait 1 ms
+end sub
+
+Sub RightSlow
+  MotorL = true
+  MotorR = false
+  wait 5
+  MotorL = false
+  MotorR = false
+  wait 5
+end sub
+
+Sub LeftSlow
+  MotorL = false
+  MotorR = true
+  wait 5
+  MotorL = false
+  MotorL = false
+  wait 5
+end sub
