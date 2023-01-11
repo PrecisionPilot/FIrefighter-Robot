@@ -164,8 +164,26 @@ Sub CheckRoom4
   // Turn
   MotorL = true
   MotorR = false
-  wait 1750 ms
-  // TODO: Check fire
+  wait 1100 ms
+
+  // Check fire
+  MotorL = false
+  fireValue = ReadAD(AN4)
+  locate (0, 0)
+  print ("Fire: ")
+  print (fireValue)
+  if fireValue < 50 then
+    MotorL = true
+    MotorR = true
+    wait 200 ms
+  else
+    // Turn around and proceed to room 1
+    MotorL = false
+    MotorL2 = true
+    wait 1100 ms
+    MotorL2 = false
+  end if
+  
 end sub
 
 Sub FireCheck
