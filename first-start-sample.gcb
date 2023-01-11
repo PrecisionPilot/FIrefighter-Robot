@@ -39,6 +39,7 @@ Dim fireValue as byte
 Dim lineCount as byte
 Dim isFire as byte
 Dim fireTrigger as byte
+Dim fireRoom4 as byte
 
 
 // Void setup
@@ -47,13 +48,14 @@ LineDet = true
 lineCount = 0
 isFire = 0
 fireTrigger = 5
+fireRoom4 = 0
 // Motors on by default
 MotorL = false
 MotorR = false
 MotorL2 = false
 MotorR2 = false
 
-gosub CheckRoom4
+// gosub CheckRoom4
 
 Do
   wallDistF = ReadAD(AN0)
@@ -145,6 +147,11 @@ Do
       else
         gosub Straight
       end if
+      // if lineCount == 6 then
+      //   if wallDistL > 25 then
+          
+      //   gosub CheckRoom4
+      // end if
     end if
   end if
 
@@ -172,7 +179,7 @@ Sub CheckRoom4
   locate (0, 0)
   print ("Fire: ")
   print (fireValue)
-  if fireValue < 50 then
+  if fireValue < 100 then
     MotorL = true
     MotorR = true
     wait 200 ms
@@ -183,7 +190,6 @@ Sub CheckRoom4
     wait 1100 ms
     MotorL2 = false
   end if
-  
 end sub
 
 Sub FireCheck
