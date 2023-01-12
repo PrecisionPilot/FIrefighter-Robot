@@ -55,8 +55,6 @@ MotorR = false
 MotorL2 = false
 MotorR2 = false
 
-// gosub CheckRoom4
-
 Do
   wallDistF = ReadAD(AN0)
   wallDistF = (((6787/(wallDistF-3)))-4)/5
@@ -95,63 +93,11 @@ Do
     print("No fire")
     FanMotor = false
     
-    // Room 2
-    if lineCount = 100 then
-    //   else if wallDistF =< 10 then
-    //     // locate 0,0
-    //     // print ("Reverse")
-    //     gosub Reverse
-    //   else if wallDistL > 25 then
-    //     gosub TurnLeftSharp
-    //     // locate 0,0
-    //     // print("Left Sharp")
-    //   else if wallDistL > 20 then
-    //     gosub TurnLeft
-    //     // Locate 0,0
-    //     // print("Left")
-    //   else if wallDistL < 10 then
-    //     // Locate 0,0
-    //     // print("Right")
-    //     MotorL = true
-    //     MotorR = false
-    //     wait 150 ms
-    //     // gosub TurnRight
-    //   else
-    //     gosub Straight
-    //   end if
-    // // Default "room"
-    else
-      if wallDistF =< 10 & wallDistL =< 10 then
-        // locate 0,0
-        // print ("Right Sharp")
-        gosub TurnRightSharp
-      else if wallDistF =< 10 then
-        // locate 0,0
-        // print ("Reverse")
-        gosub Reverse
-      else if wallDistL > 25 then
-        gosub TurnLeftSharp
-        // locate 0,0
-        // print("Left Sharp")
-      else if wallDistL > 20 then
-        gosub TurnLeft
-        // Locate 0,0
-        // print("Left")
-      else if wallDistL < 10 then
-        // Locate 0,0
-        // print("Right")
-        MotorL = true
-        MotorR = false
-        wait 100 ms
-        // gosub TurnRight
-      else
-        gosub Straight
-      end if
-      // if lineCount == 6 then
-      //   if wallDistL > 25 then
-          
-      //   gosub CheckRoom4
-      // end if
+    // Wall hug
+    if false then
+      gosub WallHug1
+    else 
+      gosub WallHug2
     end if
   end if
 
@@ -189,6 +135,48 @@ Sub CheckRoom4
     MotorL2 = true
     wait 1100 ms
     MotorL2 = false
+  end if
+end sub
+
+Sub WallHug1
+  if wallDistF =< 10 & wallDistL =< 10 then
+    // locate 0,0
+    // print ("Right Sharp")
+    gosub TurnRightSharp
+  else if wallDistF =< 10 then
+    // locate 0,0
+    // print ("Reverse")
+    gosub Reverse
+  else if wallDistL > 25 then
+    gosub TurnLeftSharp
+    // locate 0,0
+    // print("Left Sharp")
+  else if wallDistL > 20 then
+    gosub TurnLeft
+    // Locate 0,0
+    // print("Left")
+  else if wallDistL < 10 then
+    // Locate 0,0
+    // print("Right")
+    MotorL = true
+    MotorR = false
+    wait 100 ms
+    // gosub TurnRight
+  else
+    gosub Straight
+  end if
+  // if lineCount == 6 then
+  //   if wallDistL > 25 then
+      
+  //   gosub CheckRoom4
+  // end if
+end sub
+
+Sub WallHug2
+  if wallDistF < 10 then
+    gosub RightTurn90
+  else if wallDistL 
+    gosub straight
   end if
 end sub
 
@@ -282,17 +270,33 @@ end sub
 Sub RightSlow
   MotorL = true
   MotorR = false
-  wait 5
+  wait 5 ms
   MotorL = false
   MotorR = false
-  wait 5
+  wait 5 ms
 end sub
 
 Sub LeftSlow
   MotorL = false
   MotorR = true
-  wait 5
+  wait 5 ms
   MotorL = false
   MotorL = false
-  wait 5
+  wait 5 ms
+end sub
+
+Sub LeftTurn90
+  MotorL = false
+  MotorR = true
+  wait 800 ms
+  MotorL = false
+  MotorR = false
+end sub
+
+Sub RightTurn90
+  MotorL = true
+  MotorR = false
+  wait 800 ms
+  MotorL = false
+  MotorR = false
 end sub
