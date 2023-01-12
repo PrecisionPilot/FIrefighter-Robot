@@ -173,17 +173,23 @@ Sub WallHug1
 end sub
 
 Sub WallHug2
-  if wallDistF < 17 then
+  if wallDistF < 15 then
     gosub RightTurn90
   // No wall to the left
-  // else if wallDistL > 25 then 
-    
+  else if wallDistL > 25 then
+    wait 500 ms
+    gosub LeftTurn90
+    gosub Straight
+    wait 1600 ms
+    gosub LeftTurn90
+    gosub Straight
+    wait 3000 ms
   else if wallDistL <= 8 then
     gosub SlightRight
   else if wallDistL >= 10 then
     gosub SlightLeft
   else
-    gosub straight
+    gosub Straight
   end if
 end sub
 
@@ -308,7 +314,7 @@ Sub LeftTurn90
   MotorL2 = true
   MotorR = true
   MotorR2 = false
-  wait 550 ms
+  wait 450 ms
   MotorL = false
   MotorR = false
   MotorL2 = false
@@ -320,7 +326,7 @@ Sub RightTurn90
   MotorL2 = false
   MotorR = false
   MotorR2 = true
-  wait 550 ms
+  wait 480 ms
   MotorL = false
   MotorR = false
   MotorL2 = false
