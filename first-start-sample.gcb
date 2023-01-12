@@ -173,12 +173,23 @@ Sub WallHug1
 end sub
 
 Sub WallHug2
-  if wallDistF < 10 then
+  if wallDistF < 17 then
     gosub RightTurn90
-  else if wallDistL 
+  // No wall to the left
+  // else if wallDistL > 25 then 
+    
+  else if wallDistL <= 8 then
+    gosub SlightRight
+  else if wallDistL >= 10 then
+    gosub SlightLeft
+  else
     gosub straight
   end if
 end sub
+
+
+
+// --------- PROCEDURES ---------
 
 Sub FireCheck
   // Set right and left motors off by default
@@ -212,6 +223,11 @@ Sub Straight
   MotorL = true
   MotorR = true
   wait 10 ms
+end sub
+
+Sub Stop
+  MotorL = false
+  MotorR = false
 end sub
 
 Sub Reverse
@@ -267,36 +283,46 @@ Sub TurnRightSharp
   wait 1 ms
 end sub
 
-Sub RightSlow
+// Turn right very slowly
+Sub SlightRight
   MotorL = true
   MotorR = false
-  wait 5 ms
-  MotorL = false
-  MotorR = false
-  wait 5 ms
+  wait 1 ms
+  MotorL = true
+  MotorR = true
+  wait 3 ms
 end sub
 
-Sub LeftSlow
+// Turn left very slowly
+Sub SlightLeft
   MotorL = false
   MotorR = true
-  wait 5 ms
-  MotorL = false
-  MotorL = false
-  wait 5 ms
+  wait 1 ms
+  MotorL = true
+  MotorL = true
+  wait 3 ms
 end sub
 
 Sub LeftTurn90
   MotorL = false
+  MotorL2 = true
   MotorR = true
-  wait 800 ms
+  MotorR2 = false
+  wait 550 ms
   MotorL = false
   MotorR = false
+  MotorL2 = false
+  MotorR2 = false
 end sub
 
 Sub RightTurn90
   MotorL = true
+  MotorL2 = false
   MotorR = false
-  wait 800 ms
+  MotorR2 = true
+  wait 550 ms
   MotorL = false
   MotorR = false
+  MotorL2 = false
+  MotorR2 = false
 end sub
