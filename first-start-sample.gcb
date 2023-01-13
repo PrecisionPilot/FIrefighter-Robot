@@ -39,7 +39,7 @@ Dim fireValue as byte
 Dim lineCount as byte
 Dim isFire as byte
 Dim fireTrigger as byte
-Dim fireRoom4 as byte
+Dim wallHug as byte
 
 
 // Void setup
@@ -48,7 +48,7 @@ LineDet = true
 lineCount = 0
 isFire = 0
 fireTrigger = 5
-fireRoom4 = 0
+wallHug = 1
 // Motors on by default
 MotorL = false
 MotorR = false
@@ -67,21 +67,22 @@ Do
   Locate 0,0
   // print("Front: ")
   // print (wallDistF)
-  print ("Left: ")
-  print (wallDistL)
-  // print ("F: ")
-  // print (fireValue)
   // print ("Front: ")
   // print (wallDistF)
-  Locate 1,0
+  // Locate 1,0
+  // print ("Left: ")
+  // print (wallDistL)
+  // print ("F: ")
+  // print (fireValue)
+  // Locate 1,0
   print ("Line Det: ")
   print (lineCount)
   if fireValue <= fireTrigger then
     isFire = 1
   end if
   if isFire = 1 then
-    locate (1, 0)
-    print ("Fire!!")
+    // locate (1, 0)
+    // print ("Fire!!")
     FanMotor = true
     gosub FireCheck
 
@@ -89,12 +90,12 @@ Do
       isFire = 0
     end if
   else
-    locate (1, 0)
-    print("No fire")
+    // locate (1, 0)
+    // print("No fire")
     FanMotor = false
     
     // Wall hug
-    if false then
+    if wallHug = 1 then
       gosub WallHug1
     else 
       gosub WallHug2
@@ -103,7 +104,11 @@ Do
 
   // Line detection
   if lineDetValue < 100 then
+    wait 150 ms
     lineCount += 1
+    if lineCount = 5 then
+      wallHug = 2
+    end if
   end if
   
 
@@ -122,9 +127,9 @@ Sub CheckRoom4
   // Check fire
   MotorL = false
   fireValue = ReadAD(AN4)
-  locate (0, 0)
-  print ("Fire: ")
-  print (fireValue)
+  // locate (0, 0)
+  // print ("Fire: ")
+  // print (fireValue)
   if fireValue < 100 then
     MotorL = true
     MotorR = true
@@ -165,11 +170,6 @@ Sub WallHug1
   else
     gosub Straight
   end if
-  // if lineCount == 6 then
-  //   if wallDistL > 25 then
-      
-  //   gosub CheckRoom4
-  // end if
 end sub
 
 Sub WallHug2
@@ -177,16 +177,24 @@ Sub WallHug2
     gosub RightTurn90
   // No wall to the left
   else if wallDistL > 25 then
-    wait 500 ms
-    gosub LeftTurn90
-    gosub Straight
-    wait 1600 ms
-    gosub LeftTurn90
-    gosub Straight
-    wait 3000 ms
-  else if wallDistL <= 8 then
+    if lineCount = 5 then
+      MotorL = true
+      MotorR = true
+      wait 500 ms
+      gosub LeftTurn90
+      gosub Straight
+      wait 1400 ms
+      gosub LeftTurn90
+      gosub Straight
+      wait 3500 ms
+      gosub LeftTurn90
+      gosub Straight
+      wait 650 ms
+      wallHug = 1
+    end if
+  else if wallDistL <= 9 then
     gosub SlightRight
-  else if wallDistL >= 10 then
+  else if wallDistL >= 11 then
     gosub SlightLeft
   else
     gosub Straight
@@ -311,24 +319,32 @@ end sub
 
 Sub LeftTurn90
   MotorL = false
+  MotorR = false
+  wait 300 ms
+  MotorL = false
   MotorL2 = true
   MotorR = true
   MotorR2 = false
-  wait 450 ms
+  wait 405 ms
   MotorL = false
   MotorR = false
   MotorL2 = false
   MotorR2 = false
+  wait 300 ms
 end sub
 
 Sub RightTurn90
+  MotorL = false
+  MotorR = false
+  wait 300 ms
   MotorL = true
   MotorL2 = false
   MotorR = false
   MotorR2 = true
-  wait 480 ms
+  wait 435 ms
   MotorL = false
   MotorR = false
   MotorL2 = false
   MotorR2 = false
+  wait 300 ms
 end sub
