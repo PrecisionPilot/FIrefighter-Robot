@@ -39,14 +39,20 @@ Dim fireValue as byte
 Dim lineCount as byte
 Dim isFire as byte
 Dim fireTrigger as byte
+Dim rightTurns as byte
 
 
-// Void setup
+// ---------- Void Setup ----------
 FanMotor = false
 LineDet = true
 lineCount = 0
+rightTurns = 0
+
+// Adjust values for fire detection
 isFire = 0
 fireTrigger = 5
+stopFireTrigger = 210
+
 // Motors on by default
 MotorL = false
 MotorR = false
@@ -54,12 +60,12 @@ MotorL2 = false
 MotorR2 = false
 
 Do
-  wallDistF = ReadAD(AN0)
-  wallDistF = (((6787/(wallDistF-3)))-4)/5
-  wallDistL = ReadAD(AN1)
-  wallDistL = (((6787/(wallDistL-3)))-4)/5
-  fireValue = ReadAD(AN4)
-  lineDetValue = ReadAD(AN3)
+    wallDistF = ReadAD(AN0)
+    wallDistF = (((6787/(wallDistF-3)))-4)/5
+    wallDistL = ReadAD(AN1)
+    wallDistL = (((6787/(wallDistL-3)))-4)/5
+    fireValue = ReadAD(AN4)
+    lineDetValue = ReadAD(AN3)
 
   // CLS
   // Locate 0,0
@@ -78,59 +84,91 @@ Do
 
 
 
-  if fireValue <= fireTrigger then
-    isFire = 1
-  end if
-  if isFire = 1 then
-    FanMotor = true
-    gosub ExtinguishFire
-
-    if fireValue > 210 then
-      isFire = 0
+    if fireValue <= fireTrigger then
+        isFire = 1
     end if
-  else
-    FanMotor = false
+    if isFire = 1 then
+        FanMotor = true
+        gosub ExtinguishFire
 
-    // ----------- MAIN CODE -----------
-    gosub WallHug2
-
-    // ROOM 1
-    gosub LineDetection
-    if lineCount = 2 then
-        gosub RightTurn135
-        // Check if fire exists
-        fireValue = ReadAD(AN4)
-        if (fireValue < 150) then
-            gosub Straight
-            wait 100 ms
-        else
-            gosub LeftTurn135
-            gosub Straight
-            wait 200 ms
+        if fireValue > stopFireTrigger then
+        isFire = 0
         end if
-        lineCount = 3
+    else
+        FanMotor = false
+
+        // ----------- MAIN CODE -----------
+        gosub WallHug2
+
+        // ROOM 1
+        gosub LineDetection
+        if lineCount = 2 then
+            gosub RightTurn135
+            // Check if fire exists
+            fireValue = ReadAD(AN4)
+            if (fireValue < 150) then
+                gosub Straight
+                wait 100 ms
+            else
+                gosub LeftTurn135
+                gosub Straight
+                wait 200 ms
+            end if
+            lineCount = 3
+        // Room 2
+        else if lineCount = 3 then
+            // Wait until the first 90 degree turn
+            if rightTurns = 2 then
+                // Go forward for x seconds
+                // Or: go forward until front wall distance is something
+                Do until wallDistF < 60
+                    wallDistF = ReadAD(AN0)
+                    wallDistF = (((6787/(wallDistF-3)))-4)/5
+                    gosub wallHug2
+                Loop
+
+                // Turn right and check for flame
+                gosub RightTurn90
+                fireValue = ReadAD(AN4)
+                if (fireValue < 150) then
+                    gosub Straight
+                    wait 200 ms
+                else
+                    gosub LeftTurn90
+                    gosub Straight
+                    wait 200 ms
+                end if
+
+                lineCount += 1
+                // Imaginary line to stop the code (there's not technically a line there)
+            end if
+        // Room 3
+        else if lineCount = 4 then
+            // Room 3 code
+        end if
     end if
   end if
 Loop
 
 
 Sub WallHug2
-  CLS
-  locate(0, 0)
-  print(lineCount)
-  if wallDistF < 15 then
-    gosub RightTurn90
-    // gosub Align
-  // No wall to the left
-  else if wallDistL > 25 Then
-    // pass
-  else if wallDistL <= 9 then
-    gosub TurnRight
-  else if wallDistL >= 11 then
-    gosub TurnLeft
-  else
-    gosub Straight
-  end if
+    CLS
+    locate(0, 0)
+    print(lineCount)
+    if wallDistF < 15 then
+        gosub RightTurn90
+        rightTurns += 1
+        // gosub Align
+    // No wall to the left
+    else if wallDistL > 25 then
+        // pass
+    else if wallDistL <= 9 then
+        gosub TurnRight
+    else if wallDistL >= 11 then
+        gosub TurnLeft
+    else
+        gosub Straight
+    end if
 end sub
 
 // --------- PROCEDURES ---------

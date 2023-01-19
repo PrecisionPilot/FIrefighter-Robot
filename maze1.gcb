@@ -63,8 +63,8 @@ Do
   fireValue = ReadAD(AN4)
   lineDetValue = ReadAD(AN3)
 
-  CLS
-  Locate 0,0
+  // CLS
+  // Locate 0,0
   // print("Front: ")
   // print (wallDistF)
   // print ("Front: ")
@@ -75,8 +75,8 @@ Do
   // print ("F: ")
   // print (fireValue)
   // Locate 1,0
-  print ("Line Det: ")
-  print (lineCount)
+  // print ("Line Det: ")
+  // print (lineCount)
   if fireValue <= fireTrigger then
     isFire = 1
   end if
@@ -97,21 +97,10 @@ Do
     // Wall hug
     if wallHug = 1 then
       gosub WallHug1
-    else 
+    else
       gosub WallHug2
     end if
   end if
-
-  // Line detection
-  if lineDetValue < 100 then
-    wait 150 ms
-    lineCount += 1
-    if lineCount = 5 then
-      wallHug = 2
-    end if
-  end if
-  
-
 Loop
 
 Sub CheckRoom4
@@ -144,6 +133,12 @@ Sub CheckRoom4
 end sub
 
 Sub WallHug1
+  // Testing
+  if lineCount = 5 then
+    gosub LeftTurn90
+    gosub Align
+    WallHug = 2
+  end if
   if wallDistF =< 10 & wallDistL =< 10 then
     // locate 0,0
     // print ("Right Sharp")
@@ -170,17 +165,47 @@ Sub WallHug1
   else
     gosub Straight
   end if
+
+  // Line detection
+  if lineDetValue < 100 then
+    wait 150 ms
+    lineCount += 1
+    // if lineCount = 5 then
+    //   wallHug = 2
+    // end if
+  end if
 end sub
 
 Sub WallHug2
+  CLS
+  locate(0, 0)
+  print(lineCount)
   if wallDistF < 15 then
     gosub RightTurn90
+    // gosub Align
   // No wall to the left
   else if wallDistL > 25 then
+    // if lineCount < 3 then
+    //   MotorL = true
+    //   MotorR = true
+    //   wait 250 ms
+    //   gosub LeftTurn90
+    //   gosub Straight
+    //   wait 1200 ms
+    //   gosub LeftTurn90
+    //   gosub Straight
+    //   wait 400 ms
+    //   lineCount += 1
+    // else if lineCount = 3 then
+    //   MotorL = true
+    //   MotorR = true
+    //   wait 500 ms
+    //   gosub LeftTurn90
+    //   gosub Straight
     if lineCount = 5 then
       MotorL = true
       MotorR = true
-      wait 500 ms
+      wait 600 ms
       gosub LeftTurn90
       gosub Straight
       wait 1400 ms
@@ -190,18 +215,18 @@ Sub WallHug2
       gosub LeftTurn90
       gosub Straight
       wait 650 ms
-      wallHug = 1
+      lineCount += 1
     end if
   else if wallDistL <= 9 then
-    gosub SlightRight
+    gosub TurnRight
   else if wallDistL >= 11 then
-    gosub SlightLeft
+    gosub TurnLeft
   else
     gosub Straight
   end if
 end sub
 
-
+// 멋업
 
 // --------- PROCEDURES ---------
 
@@ -325,7 +350,23 @@ Sub LeftTurn90
   MotorL2 = true
   MotorR = true
   MotorR2 = false
-  wait 405 ms
+  wait 400 ms
+  MotorL = false
+  MotorR = false
+  MotorL2 = false
+  MotorR2 = false
+  wait 300 ms
+end sub
+
+Sub LeftTurn45
+  MotorL = false
+  MotorR = false
+  wait 300 ms
+  MotorL = false
+  MotorL2 = true
+  MotorR = true
+  MotorR2 = false
+  wait 200 ms
   MotorL = false
   MotorR = false
   MotorL2 = false
@@ -334,6 +375,7 @@ Sub LeftTurn90
 end sub
 
 Sub RightTurn90
+  print("no")
   MotorL = false
   MotorR = false
   wait 300 ms
@@ -347,4 +389,32 @@ Sub RightTurn90
   MotorL2 = false
   MotorR2 = false
   wait 300 ms
+end sub
+
+Sub Align
+  gosub Stop
+  wait 1000 ms
+  Do Until wallDistF > 40
+    CLS
+    locate (0, 0)
+    print("Aligning")
+    
+    MotorL = false
+    MotorR = true
+    wait 3 ms
+
+    MotorL = true
+    MotorL2 = false
+    MotorR = false
+    MotorR2 = true
+    wait 1 ms
+
+    wallDistF = ReadAD(AN0)
+    wallDistF = (((6787/(wallDistF-3)))-4)/5
+  loop
+  wait 50 ms
+  MotorL = false
+  MotorR = false
+  MotorL2 = false
+  MotorR2 = false
 end sub
