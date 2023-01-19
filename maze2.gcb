@@ -1,0 +1,369 @@
+#CHIP 16F887
+
+// Components
+#DEFINE MotorL PortB.2
+#DEFINE MotorL2 PortB.3
+#DEFINE MotorR PortB.4
+#DEFINE MotorR2 PortB.5
+#DEFINE WallDet1 PortA.0 // D2, AN0
+#DEFINE WallDet2 PortA.1 // D3, AN1
+#DEFINE LineDet PortA.3 // D5, AN3
+#DEFINE FireDet PortA.5 // D7, AN4
+#DEFINE FanMotor PortB.1
+
+// LCD display
+#DEFINE LCD_IO 4
+#DEFINE LCD_RS portd.0
+#DEFINE LCD_RW portd.1
+#DEFINE LCD_Enable portd.2
+#DEFINE LCD_DB4 portd.4
+#DEFINE LCD_DB5 portd.5
+#DEFINE LCD_DB6 portd.6
+#DEFINE LCD_DB7 portd.7
+
+// Pinout
+Dir MotorL Out
+Dir MotorL2 Out
+Dir MotorR Out
+Dir MotorR2 Out
+Dir LineDet In
+Dir WallDet1 In
+Dir WallDet2 In
+Dir FireDet In
+Dir FanMotor Out
+
+// Variables
+Dim wallDist as byte
+Dim deltaWallDist as byte
+Dim fireValue as byte
+Dim lineCount as byte
+Dim isFire as byte
+Dim fireTrigger as byte
+
+
+// Void setup
+FanMotor = false
+LineDet = true
+lineCount = 0
+isFire = 0
+fireTrigger = 5
+// Motors on by default
+MotorL = false
+MotorR = false
+MotorL2 = false
+MotorR2 = false
+
+Do
+  wallDistF = ReadAD(AN0)
+  wallDistF = (((6787/(wallDistF-3)))-4)/5
+  wallDistL = ReadAD(AN1)
+  wallDistL = (((6787/(wallDistL-3)))-4)/5
+  fireValue = ReadAD(AN4)
+  lineDetValue = ReadAD(AN3)
+
+  // CLS
+  // Locate 0,0
+  // print("Front: ")
+  // print (wallDistF)
+  // print ("Front: ")
+  // print (wallDistF)
+  // Locate 1,0
+  // print ("Left: ")
+  // print (wallDistL)
+  // print ("F: ")
+  // print (fireValue)
+  // Locate 1,0
+  // print ("Line Det: ")
+  // print (lineCount)
+
+
+
+  if fireValue <= fireTrigger then
+    isFire = 1
+  end if
+  if isFire = 1 then
+    FanMotor = true
+    gosub ExtinguishFire
+
+    if fireValue > 210 then
+      isFire = 0
+    end if
+  else
+    FanMotor = false
+
+    // ----------- MAIN CODE -----------
+    gosub WallHug2
+
+    // ROOM 1
+    gosub LineDetection
+    if lineCount = 2 then
+        gosub RightTurn135
+        // Check if fire exists
+        fireValue = ReadAD(AN4)
+        if (fireValue < 150) then
+            gosub Straight
+            wait 100 ms
+        else
+            gosub LeftTurn135
+            gosub Straight
+            wait 200 ms
+        end if
+        lineCount = 3
+    end if
+  end if
+Loop
+
+
+Sub WallHug2
+  CLS
+  locate(0, 0)
+  print(lineCount)
+  if wallDistF < 15 then
+    gosub RightTurn90
+    // gosub Align
+  // No wall to the left
+  else if wallDistL > 25 Then
+    // pass
+  else if wallDistL <= 9 then
+    gosub TurnRight
+  else if wallDistL >= 11 then
+    gosub TurnLeft
+  else
+    gosub Straight
+  end if
+end sub
+
+// --------- PROCEDURES ---------
+            
+
+Sub LineDetection
+    if lineDetValue < 100 then
+        wait 150 ms
+        lineCount += 1
+        // if lineCount = 5 then
+        //   wallHug = 2
+        // end if
+    end if
+end sub
+
+Sub ExtinguishFire
+  // Set right and left motors off by default
+
+  // Right and back
+  MotorL = true
+  MotorL2 = false
+  MotorR = false
+  MotorR2 = true
+  wait 175 ms
+  MotorL = false
+  MotorL2 = true
+  MotorR = true
+  MotorR2 = false
+  wait 175 ms
+
+  // Left and back
+  MotorR = true
+  MotorR2 = false
+  MotorL = false
+  MotorL2 = true
+  wait 190 ms
+  MotorR = false
+  MotorR2 = true
+  MotorL = true
+  MotorL2 = false
+  wait 175 ms
+end sub
+
+Sub Straight
+  MotorL = true
+  MotorR = true
+  wait 10 ms
+end sub
+
+Sub Stop
+  MotorL = false
+  MotorR = false
+end sub
+
+Sub Reverse
+  MotorL = false
+  MotorR = false
+  MotorL2 = true
+  MotorR2 = true
+  wait 500 ms
+// Start going forward
+  MotorL2 = false
+  MotorR2 = false
+// Turn right a bit
+  MotorL = true
+  MotorR = false
+  wait 750 ms
+  MotorL = false
+  MotorR = false
+end sub
+
+Sub TurnLeft
+  MotorL = false
+  MotorR = true
+  wait 5 ms
+  MotorL = true
+  MotorR = true
+  wait 5 ms
+end sub
+
+Sub TurnLeftSharp
+  MotorL = false
+  MotorR = true
+  wait 15 ms
+  MotorL = true
+  MotorR = true
+  wait 1 ms
+end sub
+
+Sub TurnRight
+  MotorL = true
+  MotorR = false
+  wait 5 ms
+  MotorL = true
+  MotorR = true
+  wait 5 ms
+end sub
+
+Sub TurnRightSharp
+  MotorL = true
+  MotorR = false
+  wait 15 ms
+  MotorL = true
+  MotorR = true
+  wait 1 ms
+end sub
+
+// Turn right very slowly
+Sub SlightRight
+  MotorL = true
+  MotorR = false
+  wait 1 ms
+  MotorL = true
+  MotorR = true
+  wait 3 ms
+end sub
+
+// Turn left very slowly
+Sub SlightLeft
+  MotorL = false
+  MotorR = true
+  wait 1 ms
+  MotorL = true
+  MotorL = true
+  wait 3 ms
+end sub
+
+Sub LeftTurn90
+  MotorL = false
+  MotorR = false
+  wait 300 ms
+  MotorL = false
+  MotorL2 = true
+  MotorR = true
+  MotorR2 = false
+  wait 400 ms
+  MotorL = false
+  MotorR = false
+  MotorL2 = false
+  MotorR2 = false
+  wait 300 ms
+end sub
+
+Sub LeftTurn45
+  MotorL = false
+  MotorR = false
+  wait 300 ms
+  MotorL = false
+  MotorL2 = true
+  MotorR = true
+  MotorR2 = false
+  wait 200 ms
+  MotorL = false
+  MotorR = false
+  MotorL2 = false
+  MotorR2 = false
+  wait 300 ms
+end sub
+
+Sub RightTurn90
+  print("no")
+  MotorL = false
+  MotorR = false
+  wait 300 ms
+  MotorL = true
+  MotorL2 = false
+  MotorR = false
+  MotorR2 = true
+  wait 435 ms
+  MotorL = false
+  MotorR = false
+  MotorL2 = false
+  MotorR2 = false
+  wait 300 ms
+end sub
+
+Sub RightTurn135
+  print("no")
+  MotorL = false
+  MotorR = false
+  wait 300 ms
+  MotorL = true
+  MotorL2 = false
+  MotorR = false
+  MotorR2 = true
+  wait 600 ms
+  MotorL = false
+  MotorR = false
+  MotorL2 = false
+  MotorR2 = false
+  wait 300 ms
+end sub
+
+Sub LeftTurn135
+  MotorL = false
+  MotorR = false
+  wait 300 ms
+  MotorL = false
+  MotorL2 = true
+  MotorR = true
+  MotorR2 = false
+  wait 600 ms
+  MotorL = false
+  MotorR = false
+  MotorL2 = false
+  MotorR2 = false
+  wait 300 ms
+end sub
+
+Sub Align
+  gosub Stop
+  wait 1000 ms
+  Do Until wallDistF > 40
+    CLS
+    locate (0, 0)
+    print("Aligning")
+    
+    MotorL = false
+    MotorR = true
+    wait 3 ms
+
+    MotorL = true
+    MotorL2 = false
+    MotorR = false
+    MotorR2 = true
+    wait 1 ms
+
+    wallDistF = ReadAD(AN0)
+    wallDistF = (((6787/(wallDistF-3)))-4)/5
+  loop
+  wait 50 ms
+  MotorL = false
+  MotorR = false
+  MotorL2 = false
+  MotorR2 = false
+end sub
