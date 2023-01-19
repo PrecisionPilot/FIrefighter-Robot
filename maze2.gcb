@@ -53,7 +53,7 @@ isFire = 0
 fireTrigger = 5
 stopFireTrigger = 210
 
-// Motors on by default
+// Motors off by default
 MotorL = false
 MotorR = false
 MotorL2 = false
