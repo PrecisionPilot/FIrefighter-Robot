@@ -67,10 +67,12 @@ Do
     fireValue = ReadAD(AN4)
     lineDetValue = ReadAD(AN3)
 
-  // CLS
-  // Locate 0,0
-  // print("Front: ")
-  // print (wallDistF)
+  CLS
+  Locate 0,0
+  print (rightTurns)
+  Locate 1,0
+  print("Front: ")
+  print (wallDistF)
   // print ("Front: ")
   // print (wallDistF)
   // Locate 1,0
@@ -120,48 +122,79 @@ Do
             // Wait until the first 90 degree turn
             if rightTurns = 2 then
                 // Go forward for x seconds
-                // Or: go forward until front wall distance is something
-                Do until wallDistF < 60
-                    wallDistF = ReadAD(AN0)
-                    wallDistF = (((6787/(wallDistF-3)))-4)/5
-                    gosub wallHug2
-                Loop
 
-                // Turn right and check for flame
-                gosub RightTurn90
-                fireValue = ReadAD(AN4)
-                if (fireValue < 150) then
-                    gosub Straight
-                    wait 200 ms
-                else
-                    gosub LeftTurn90
-                    gosub Straight
-                    wait 200 ms
-                end if
+				// Go straight
+				gosub Straight
+				wait 1700 ms
 
-                lineCount += 1
+				// Turn right and check for flame
+				gosub RightTurn90
+				fireValue = ReadAD(AN4)
+				if (fireValue < 150) then
+					gosub Straight
+					wait 200 ms
+					// Don't do anything
+					lineCount = 255
+				else
+					gosub LeftTurn90
+					gosub Straight
+					wait 200 ms
+					lineCount = 4
+					// Move to room 3
+				end if
                 // Imaginary line to stop the code (there's not technically a line there)
             end if
         // Room 3
         else if lineCount = 4 then
-            // Room 3 code
-        end if
+
+		// Head for room 4
+		else if lineCount = 5 then
+			
+		end if
     end if
-  end if
 Loop
 
 
 Sub WallHug2
-    CLS
-    locate(0, 0)
-    print(lineCount)
     if wallDistF < 15 then
         gosub RightTurn90
         rightTurns += 1
         // gosub Align
     // No wall to the left
     else if wallDistL > 25 then
-        // pass
+        // Room 3 code
+		if lineCount = 4 then
+			gosub Straight
+			wait 600 ms
+			gosub LeftTurn90
+			// Go straight until it's at the wall
+			gosub Straight
+			wait 2100 ms
+
+			// Left turn, check fire
+			gosub LeftTurn90
+			if (fireValue < 150) then
+				// If fire, go forward
+				gosub Straight
+				wait 200 ms
+				// Don't do anything
+				lineCount = 255
+			else
+				// If no fire, turn back
+				gosub LeftTurn90
+				gosub Straight
+				wait 500 ms
+				// Exit this code
+				// Head for room 4, wall hug
+			end if
+		else
+			gosub Straight
+			wait 500 ms
+			gosub LeftTurn90
+			gosub Straight
+			wait 600 ms
+		end if
+
     else if wallDistL <= 9 then
         gosub TurnRight
     else if wallDistL >= 11 then
@@ -304,7 +337,7 @@ Sub LeftTurn90
   MotorL2 = true
   MotorR = true
   MotorR2 = false
-  wait 400 ms
+  wait 385 ms
   MotorL = false
   MotorR = false
   MotorL2 = false
@@ -329,7 +362,6 @@ Sub LeftTurn45
 end sub
 
 Sub RightTurn90
-  print("no")
   MotorL = false
   MotorR = false
   wait 300 ms
@@ -337,7 +369,7 @@ Sub RightTurn90
   MotorL2 = false
   MotorR = false
   MotorR2 = true
-  wait 435 ms
+  wait 370 ms
   MotorL = false
   MotorR = false
   MotorL2 = false
@@ -346,7 +378,6 @@ Sub RightTurn90
 end sub
 
 Sub RightTurn135
-  print("no")
   MotorL = false
   MotorR = false
   wait 300 ms
