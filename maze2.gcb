@@ -69,7 +69,7 @@ Do
 
   CLS
   Locate 0,0
-  print (rightTurns)
+  print (lineCount)
   Locate 1,0
   print("Front: ")
   print (wallDistF)
@@ -137,6 +137,12 @@ Do
 					lineCount = 255
 				else
 					gosub LeftTurn90
+					// Turn right a bit
+					MotorL = true
+					MotorR = false
+					wait 75 ms
+					MotorL = false
+
 					gosub Straight
 					wait 200 ms
 					lineCount = 4
@@ -149,7 +155,16 @@ Do
 
 		// Head for room 4
 		else if lineCount = 5 then
-			
+			// Note: wall hug may need to be more tight
+			// Straight, left, left, straight, detect line then left, wall hug until candle
+
+			// Straight until line detected
+			// OR: go straight for set amount of time
+			gosub Straight
+			wait 4000 ms
+			gosub LeftTurn90
+			// Do nothing but wall hug
+			lineCount = 6
 		end if
     end if
 Loop
@@ -169,16 +184,18 @@ Sub WallHug2
 			gosub LeftTurn90
 			// Go straight until it's at the wall
 			gosub Straight
-			wait 2100 ms
+			wait 2300 ms
 
 			// Left turn, check fire
 			gosub LeftTurn90
+			fireValue = ReadAD(AN4)
 			if (fireValue < 150) then
 				// If fire, go forward
 				gosub Straight
-				wait 200 ms
+				wait 600 ms
 				// Don't do anything
 				lineCount = 255
+				isFire = 1
 			else
 				// If no fire, turn back
 				gosub LeftTurn90
@@ -208,7 +225,7 @@ end sub
             
 
 Sub LineDetection
-    if lineDetValue < 100 then
+    if lineDetValue < 120 then
         wait 150 ms
         lineCount += 1
         // if lineCount = 5 then
@@ -369,7 +386,7 @@ Sub RightTurn90
   MotorL2 = false
   MotorR = false
   MotorR2 = true
-  wait 370 ms
+  wait 390 ms
   MotorL = false
   MotorR = false
   MotorL2 = false
