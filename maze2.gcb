@@ -163,7 +163,7 @@ Do
 
 		else if lineCount = 6 then
 			leftDist1 = 7
-			rightDist2 = 9
+			rightDist2 = 8
 			frontDist = 8
 		// Room 4
 		else if lineCount = 7 then
