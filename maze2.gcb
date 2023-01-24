@@ -49,7 +49,7 @@ Dim frontDist as byte
 // ---------- Void Setup ----------
 FanMotor = false
 LineDet = true
-lineCount = 6
+lineCount = 0
 rightTurns = 0
 
 leftDist1 = 9
@@ -161,13 +161,13 @@ Do
         // going to / inside Room 3
         else if lineCount = 4 then
 
+		// Prepare to enter room 4 tunnel
 		else if lineCount = 6 then
 			leftDist1 = 7
 			rightDist2 = 8
-			frontDist = 8
-		// Room 4
-		else if lineCount = 7 then
-			
+			frontDist = 11
+		else if lineCount = 8 then
+			// gosub WallHug2
 		end if
     end if
 Loop
@@ -179,7 +179,7 @@ Sub WallHug2
         rightTurns += 1
         // gosub Align
     // No wall to the left
-    else if wallDistL > 25 then
+    else if wallDistL > 30 then
         // Room 3 code
 		if lineCount = 4 then
 			gosub Straight
@@ -203,27 +203,39 @@ Sub WallHug2
 				// If no fire, turn back
 				gosub LeftTurn90
 				gosub Straight
-				wait 500 ms
+				wait 2300 ms
+				gosub LeftTurn90
+				Do until wallDistF < 20
+					wallDistF = ReadAD(AN0)
+					wallDistF = (((6787/(wallDistF-3)))-4)/5
+					gosub Straight
+				loop
+				gosub LeftTurn90
+				gosub Straight
+				wait 400 ms
+				lineCount = 6
 				// Exit this code
 				// Head for room 4, wall hug
 			end if
-		// Room 4 code
+			// Room 4 code
 		else if lineCount = 7 then
 			// Note: wall hug may need to be more tight
 			// Straight, left, left, straight, detect line then left, wall hug until candle
 
 			// When time to turn left 
 			gosub Straight
-			wait 550 ms
+			wait 650 ms
 			gosub LeftTurn90
 			// Go straight for set amount of time
 			gosub Straight
-			wait 4000 ms
+			wait 2250 ms
 			gosub LeftTurn90
+			gosub Straight
+			wait 400 ms
 			// Do nothing but wall hug
 			lineCount = 8
 		// Heading for room 4 and inside room 4 except above
-		else
+		else if lineCount < 8 then
 			gosub Straight
 			wait 460 ms
 			gosub LeftTurn90
@@ -231,7 +243,6 @@ Sub WallHug2
 			wait 600 ms
 			lineCount += 1
 		end if
-
     else if wallDistL <= leftDist1 then
         gosub TurnRight
     else if wallDistL >= leftDist2 then
@@ -371,7 +382,7 @@ Sub LeftTurn90
   MotorL2 = true
   MotorR = true
   MotorR2 = false
-  wait 405 ms
+  wait 370 ms
   MotorL = false
   MotorR = false
   MotorL2 = false
@@ -403,7 +414,7 @@ Sub RightTurn90
   MotorL2 = false
   MotorR = false
   MotorR2 = true
-  wait 390 ms
+  wait 370 ms
   MotorL = false
   MotorR = false
   MotorL2 = false
