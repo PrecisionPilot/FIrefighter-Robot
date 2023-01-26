@@ -41,16 +41,49 @@ Dim lineCount as byte
 
 
 // Void setup
-FanMotor = false
+FanMotor = true
 LineDet = true
 lineCount = 0
 // Motors on by default
-MotorL = true
-MotorR = true
+MotorL = false
+MotorR = false
 MotorL2 = false
 MotorR2 = false
 
 
 Do
-  
+    
 Loop
+
+Sub LeftTurn90
+  MotorL = false
+  MotorR = false
+  wait 300 ms
+  MotorL = false
+  MotorL2 = true
+  MotorR = true
+  MotorR2 = false
+  wait 405 ms
+//   370 ms
+  MotorL = false
+  MotorR = false
+  MotorL2 = false
+  MotorR2 = false
+  wait 300 ms
+end sub
+
+Sub RightTurn90
+  MotorL = false
+  MotorR = false
+  wait 300 ms
+  MotorL = true
+  MotorL2 = false
+  MotorR = false
+  MotorR2 = true
+  wait 420 ms
+  MotorL = false
+  MotorR = false
+  MotorL2 = false
+  MotorR2 = false
+  wait 300 ms
+end sub
