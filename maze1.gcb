@@ -164,7 +164,7 @@ Sub WallHug2
       wait 650 ms
       lineCount += 1
     end if
-  // Actual Wall hugging mechanism
+  // Actual wall hugging mechanism
   else if wallDistL <= 9 then
     gosub TurnRight
   else if wallDistL >= 11 then
@@ -336,7 +336,7 @@ Sub RightTurn90
   wait 300 ms
 end sub
 
-// Align itself against a wall to the right
+// Align itself parallel against the left wall
 Sub Align
   gosub Stop
   wait 1000 ms
