@@ -1,4 +1,4 @@
-# FIrefighter-Robot
+# Firefighter-Robot
 TEJ4MI-01 Computer Engineering Tech Project
 
 Video Link: 
