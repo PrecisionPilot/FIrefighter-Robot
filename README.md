@@ -1,6 +1,8 @@
 # Firefighter-Robot
 TEJ4MI-01 Computer Engineering Tech Project
 
+An autonomous robot that navigates its way through a maze to try to find a candle in each room and blow it out upon detection
+
 [Video Link](https://drive.google.com/file/d/1pud0PK4C9Y-MKYrYtlZdu811R3C6oz6o/view?usp=sharing)
 
 ![image](https://github.com/PrecisionPilot/FIrefighter-Robot/assets/69162332/fa794f48-3a89-44b1-92d2-29395f6c25a3)
